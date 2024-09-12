@@ -10,13 +10,16 @@ const caFile = fs.readFileSync(path.join(__dirname, "./certs/emqxsl-ca.crt"));
 
 // MQTT connection options with TLS
 const options = {
-  host: "ce2516b1.ala.asia-southeast1.emqxsl.com", // Ganti dengan URL broker EMQX kamu
+  host: "ce2516b1.ala.asia-southeast1.emqxsl.com",
   port: 8883,
   protocol: "mqtts",
   ca: caFile,
   username: "nola",
   password: "mqtt",
 };
+
+// Store the latest message received from MQTT
+let latestMessage = "Waiting for data...";
 
 // Connect to MQTT broker with TLS
 const mqttClient = mqtt.connect(options);
@@ -31,7 +34,16 @@ mqttClient.on("connect", () => {
 });
 
 mqttClient.on("message", (topic, message) => {
-  console.log(`Received message on ${topic}: ${message.toString()}`);
+  latestMessage = message.toString();
+  console.log(`Received message on ${topic}: ${latestMessage}`);
+});
+
+// Serve static HTML file
+app.use(express.static("public"));
+
+// API endpoint to get the latest message
+app.get("/latest-message", (req, res) => {
+  res.json({ message: latestMessage });
 });
 
 // API endpoint to publish messages
