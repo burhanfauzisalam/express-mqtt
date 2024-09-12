@@ -39,7 +39,11 @@ mqttClient.on("message", (topic, message) => {
 });
 
 // Serve static HTML file
-app.use(express.static("public"));
+// app.use(express.static("public"));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "./public/index.html"));
+});
 
 // API endpoint to get the latest message
 app.get("/latest-message", (req, res) => {
